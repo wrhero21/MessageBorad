@@ -1,6 +1,6 @@
 import React from 'react'
 import 'antd/dist/antd.css'
-import { Comment, Avatar, Form, Button, List, Input } from 'antd'
+import { Comment, Form, Button, List, Input } from 'antd'
 import moment from 'moment';
 import './styles/App.css'
 
@@ -21,23 +21,10 @@ const Editor = ({ onChange,onChangeName, onSubmit, submitting, name, value }) =>
       <TextArea rows={4} onChange={onChange} value={value} placeholder="請輸入留言..." />
     </Form.Item>
     <Form.Item>
-      <Button htmlType="submit" loading={submitting} onClick={onSubmit} type="primary" >
-        留言
-      </Button>
+      <Button htmlType="submit" loading={submitting} onClick={onSubmit} type="primary" >留言</Button>
     </Form.Item>
   </div>
 )
-
-/*const useLocalStorge = localStorageKey => {
-  const [value,setValue]=React.useState(
-    localStorage.getItem(localStorageKey) || ''
-  )
-  React.useEffect(()=> {
-    localStorage.setItem(localStorageKey,value)
-  },[value])
-  return [value, setValue]
-}
-*/
 
 export class App extends React.Component {
   state = {
@@ -45,7 +32,7 @@ export class App extends React.Component {
     submitting: false,
     name: '',
     value: ''
-  };
+  }
   
   handleSubmit = () => {
     if (!this.state.value) {
@@ -54,9 +41,45 @@ export class App extends React.Component {
 
     this.setState({
       submitting: true,
-    });
+    })
+
+    const useLocalStorge = (key, value) =>{
+      const reKey = localStorage.getItem(key)
+      const keyObj = reKey ? reKey + ',' + value : value
+      const setLocalStorge = localStorage.setItem(key,keyObj)
+      return setLocalStorge
+    }
+    
 
     setTimeout(() => {
+     const authorNew = useLocalStorge('author',this.state.name)
+      const commentsNew = useLocalStorge('comments',this.state.value)
+      const datetimeNew = useLocalStorge('datetime',moment().fromNow())
+    /* 
+
+     
+      const authorL = localStorage.getItem('author')
+      const authorObj = authorL ? authorL + "," + this.state.name : this.state.name
+      const commentsL = localStorage.getItem('comments')
+      const commentsObj = commentsL ? commentsL + "," + this.state.value : this.state.value
+      const datetimeL = localStorage.getItem('datetime')
+      const datetimeObj = datetimeL ? datetimeL + "," + moment().fromNow() : moment().fromNow()
+      console.log('=====setTime()======')
+      console.log('authorL:',authorL)
+      console.log('authorObj:',authorObj)
+      console.log('commentsL:',commentsL)
+      console.log('commentsObj',commentsObj)
+      console.log('datetimeL',datetimeL)
+      console.log('datetimeObj',datetimeObj)
+    
+
+      console.log(JSON.stringify(this.state.comments));
+      
+      localStorage.setItem('author', authorNew)
+      localStorage.setItem('comments', commentsNew)
+      localStorage.setItem('datetime', datetimeNew)
+    */
+
       this.setState({
         submitting: false,
         name: '',
@@ -73,24 +96,42 @@ export class App extends React.Component {
     }, 1000);
   };
 
-  handleChange = e => {
-    this.setState({
-      value: e.target.value,
-    });
-  };
   handleNameChange = e => {
     this.setState({
       name: e.target.value
     })
   }
-  render() {
-    const { comments, submitting, name, value } = this.state;
-   /* const [valueLocal, setValue] = useLocalStorge(
-      this.handleNameChange
-    )
-    */
-    //console.log(valueLocal)
+  handleChange = e => {
+    this.setState({
+      value: e.target.value,
+    })
+  }
 
+  render() {
+    const author = localStorage.getItem('author') ? localStorage.getItem('author').split(',') : []
+    const comment = localStorage.getItem('comments') ? localStorage.getItem('comments').split(',') : []
+    const datetime = localStorage.getItem('datetime') ? localStorage.getItem('datetime').split(',') : []
+   // console.log('====renfer()===')
+   // console.log('comments.length=',this.state.comments.length)
+   // console.log('submit.value:',this.state.submitting)
+   // console.log('author:',author)
+   // console.log('comment:',comment)
+   // console.log('==============')
+    if(this.state.comments.length < 1) {
+      author.forEach( (value, index) => {
+        console.log('value = ' + value)
+        console.log('index = ' + index) 
+        this.state.comments = [
+          {
+            author: <p>{value}</p>,
+            content: <p>{comment[index]}</p>,
+            datetime: datetime[index],
+          },
+          ...this.state.comments,
+        ]
+      });
+    }
+    const { comments, submitting, name, value } = this.state;
     return (
       <div>
         <header>
